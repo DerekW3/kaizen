@@ -1,5 +1,7 @@
-use crossterm::event::{read, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
+use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
+use crossterm::execute;
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
+use std::io::stdout;
 
 pub struct Editor {
     will_quit: bool,
@@ -11,10 +13,24 @@ impl Editor {
     }
 
     pub fn run(&mut self) {
-        if let Err(err) = self.repl() {
-            panic!("{err:?}");
-        }
-        println!("Goodbye.\r\n");
+        Self::initialize().unwrap();
+        let result = self.repl();
+        Self::terminate().unwrap();
+        result.unwrap();
+    }
+
+    fn initialize() -> Result<(), std::io::Error> {
+        enable_raw_mode()?;
+        Self::clear_screen()
+    }
+
+    fn terminate() -> Result<(), std::io::Error> {
+        disable_raw_mode()
+    }
+
+    fn clear_screen() -> Result<(), std::io::Error> {
+        let mut stdout = stdout();
+        execute!(stdout, Clear(ClearType::All))
     }
 
     fn repl(&mut self) -> Result<(), std::io::Error> {
@@ -38,6 +54,7 @@ impl Editor {
                 }
             }
             if self.will_quit {
+                print!("\x1b[2J");
                 break;
             }
         }
