@@ -5,22 +5,28 @@ mod terminal;
 
 pub struct Editor {
     will_quit: bool,
-    term: terminal::Terminal,
 }
 
 impl Editor {
-    pub fn default() -> Self {
-        Editor {
-            will_quit: false,
-            term: Terminal::new(),
-        }
+    pub const fn default() -> Self {
+        Self { will_quit: false }
     }
 
     pub fn run(&mut self) {
         Terminal::initialize().unwrap();
+        Self::draw_rows().unwrap();
         let result = self.repl();
         Terminal::terminate().unwrap();
         result.unwrap();
+    }
+
+    fn draw_rows() -> Result<(), std::io::Error> {
+        let (_, height) = Terminal::get_size()?;
+        for row in 0..height {
+            Terminal::move_cursor(0, row)?;
+            print!("~");
+        }
+        Ok(())
     }
 
     fn refresh_screen(&self) -> Result<(), std::io::Error> {
