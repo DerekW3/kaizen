@@ -14,7 +14,6 @@ impl Editor {
 
     pub fn run(&mut self) {
         Terminal::initialize().unwrap();
-        Self::draw_rows().unwrap();
         let result = self.repl();
         Terminal::terminate().unwrap();
         result.unwrap();
@@ -23,8 +22,10 @@ impl Editor {
     fn draw_rows() -> Result<(), std::io::Error> {
         let (_, height) = Terminal::get_size()?;
         for row in 0..height {
-            Terminal::move_cursor(0, row)?;
             print!("~");
+            if row + 1 < height {
+                print!("\r\n");
+            }
         }
         Ok(())
     }
@@ -33,6 +34,9 @@ impl Editor {
         if self.will_quit {
             Terminal::clear_screen()?;
             print!("Goodbye. \r\n");
+        } else {
+            Self::draw_rows()?;
+            Terminal::move_cursor(0, 0)?;
         }
         Ok(())
     }
