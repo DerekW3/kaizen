@@ -3,6 +3,8 @@ use crossterm::execute;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 use std::io::stdout;
 
+mod terminal;
+
 pub struct Editor {
     will_quit: bool,
 }
