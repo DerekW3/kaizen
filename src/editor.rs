@@ -1,26 +1,31 @@
 use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
+use terminal::Terminal;
 
 mod terminal;
 
 pub struct Editor {
     will_quit: bool,
+    term: terminal::Terminal,
 }
 
 impl Editor {
     pub fn default() -> Self {
-        Editor { will_quit: false }
+        Editor {
+            will_quit: false,
+            term: Terminal::new(),
+        }
     }
 
     pub fn run(&mut self) {
-        terminal::initialize().unwrap();
+        Terminal::initialize().unwrap();
         let result = self.repl();
-        terminal::terminate().unwrap();
+        Terminal::terminate().unwrap();
         result.unwrap();
     }
 
     fn refresh_screen(&self) -> Result<(), std::io::Error> {
         if self.will_quit {
-            terminal::clear_screen()?;
+            Terminal::clear_screen()?;
             print!("Goodbye. \r\n");
         }
         Ok(())
