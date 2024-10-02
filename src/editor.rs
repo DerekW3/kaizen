@@ -1,7 +1,4 @@
 use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
-use crossterm::execute;
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
-use std::io::stdout;
 
 mod terminal;
 
@@ -15,29 +12,15 @@ impl Editor {
     }
 
     pub fn run(&mut self) {
-        Self::initialize().unwrap();
+        terminal::initialize().unwrap();
         let result = self.repl();
-        Self::terminate().unwrap();
+        terminal::terminate().unwrap();
         result.unwrap();
-    }
-
-    fn initialize() -> Result<(), std::io::Error> {
-        enable_raw_mode()?;
-        Self::clear_screen()
-    }
-
-    fn terminate() -> Result<(), std::io::Error> {
-        disable_raw_mode()
-    }
-
-    fn clear_screen() -> Result<(), std::io::Error> {
-        let mut stdout = stdout();
-        execute!(stdout, Clear(ClearType::All))
     }
 
     fn refresh_screen(&self) -> Result<(), std::io::Error> {
         if self.will_quit {
-            Self::clear_screen()?;
+            terminal::clear_screen()?;
             print!("Goodbye. \r\n");
         }
         Ok(())
