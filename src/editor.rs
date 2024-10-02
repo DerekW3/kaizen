@@ -33,32 +33,40 @@ impl Editor {
         execute!(stdout, Clear(ClearType::All))
     }
 
-    fn repl(&mut self) -> Result<(), std::io::Error> {
-        enable_raw_mode()?;
-        loop {
-            if let Key(KeyEvent {
-                code,
-                modifiers,
-                kind,
-                state,
-            }) = read()?
-            {
-                println!(
-                    "Code: {code:?} Modifiers: {modifiers:?} Kind: {kind:?} State: {state:?} \r"
-                );
-                match code {
-                    Char('q') if modifiers == KeyModifiers::CONTROL => {
-                        self.will_quit = true;
-                    }
-                    _ => (),
+    fn refresh_screen(&self) -> Result<(), std::io::Error> {
+        if self.will_quit {
+            Self::clear_screen()?;
+            print!("Goodbye. \r\n");
+        }
+        Ok(())
+    }
+
+    fn evaluate_event(&mut self, event: &Event) {
+        if let Key(KeyEvent {
+            code, modifiers, ..
+        }) = event
+        {
+            match code {
+                Char('q') if *modifiers == KeyModifiers::CONTROL => {
+                    self.will_quit = true;
                 }
+                _ => (),
             }
+        }
+    }
+
+    fn repl(&mut self) -> Result<(), std::io::Error> {
+        loop {
+            let event = read()?;
+
+            self.evaluate_event(&event);
+
+            self.refresh_screen()?;
+
             if self.will_quit {
-                print!("\x1b[2J");
                 break;
             }
         }
-        disable_raw_mode()?;
         Ok(())
     }
 }
