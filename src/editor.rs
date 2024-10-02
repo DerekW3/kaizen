@@ -53,15 +53,15 @@ impl Editor {
 
     fn repl(&mut self) -> Result<(), std::io::Error> {
         loop {
-            let event = read()?;
-
-            self.evaluate_event(&event);
-
             self.refresh_screen()?;
 
             if self.will_quit {
                 break;
             }
+
+            let event = read()?;
+
+            self.evaluate_event(&event);
         }
         Ok(())
     }
