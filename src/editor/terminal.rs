@@ -58,7 +58,7 @@ impl Terminal {
         Ok(())
     }
 
-    pub fn print_string(input: &str) -> Result<(), Error> {
+    pub fn print(input: &str) -> Result<(), Error> {
         queue!(stdout(), Print(input))?;
         Ok(())
     }
