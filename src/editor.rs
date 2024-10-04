@@ -20,13 +20,15 @@ impl Editor {
     }
 
     fn draw_rows() -> Result<(), std::io::Error> {
+        Terminal::hide_cursor()?;
         let terminal_dims = Terminal::get_size()?;
         for row in 0..terminal_dims.height {
-            print!("~");
+            Terminal::print_string("~")?;
             if row + 1 < terminal_dims.height {
-                print!("\r\n");
+                Terminal::print_string("\r\n")?;
             }
         }
+        Terminal::show_cursor()?;
         Ok(())
     }
 
