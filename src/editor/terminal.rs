@@ -4,10 +4,15 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearT
 use std::io::stdout;
 
 pub struct Terminal {}
+pub struct Dimensions {
+    pub width: u16,
+    pub height: u16,
+}
 
 impl Terminal {
-    pub fn get_size() -> Result<(u16, u16), std::io::Error> {
-        size()
+    pub fn get_size() -> Result<Dimensions, std::io::Error> {
+        let (width, height) = size()?;
+        Ok(Dimensions { width, height })
     }
 
     pub fn clear_screen() -> Result<(), std::io::Error> {

@@ -20,10 +20,10 @@ impl Editor {
     }
 
     fn draw_rows() -> Result<(), std::io::Error> {
-        let (_, height) = Terminal::get_size()?;
-        for row in 0..height {
+        let terminal_dims = Terminal::get_size()?;
+        for row in 0..terminal_dims.height {
             print!("~");
-            if row + 1 < height {
+            if row + 1 < terminal_dims.height {
                 print!("\r\n");
             }
         }
