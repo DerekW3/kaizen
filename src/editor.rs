@@ -4,6 +4,9 @@ use terminal::{Shape, Terminal};
 
 mod terminal;
 
+const NAME: &str = env!("CARGO_PKG_NAME");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 pub struct Editor {
     will_quit: bool,
 }
@@ -21,20 +24,26 @@ impl Editor {
     }
 
     fn draw_rows() -> Result<(), Error> {
-        let Shape { width, height } = Terminal::get_size()?;
+        let Shape { height, .. } = Terminal::get_shape()?;
         for row in 0..height {
             Terminal::clear_line()?;
             Terminal::print("~")?;
-            if row == height / 2 {
-                let welcome = "kaizen 0.1.0";
-                let spacing = " ".repeat((width / 2) as usize - (welcome.len() / 2) + 1);
-                Terminal::print(&spacing)?;
-                Terminal::print(welcome)?;
-            }
             if row + 1 < height {
                 Terminal::print("\r\n")?;
             }
         }
+        Ok(())
+    }
+
+    fn draw_welcome_message() -> Result<(), Error> {
+        let mut welcome_message = format!("{NAME} editor -- version {VERSION");
+        let width = Terminal::get_shape()?.width as usize;
+        let length = welcome_message.len();
+        let padding = (width - length) / 2;
+        let spaces = " ".repeat(padding - 1);
+        welcome_message = format!("~{spaces}{welcome_message}");
+        welcome_message.truncate(width);
+        Terminal::print(welcome_message)?;
         Ok(())
     }
 

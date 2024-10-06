@@ -2,6 +2,7 @@ use crossterm::cursor::{Hide, MoveTo, Show};
 use crossterm::style::Print;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType};
 use crossterm::{queue, Command};
+use std::fmt::Display;
 use std::io::{stdout, Error, Write};
 
 pub struct Terminal;
@@ -22,7 +23,7 @@ impl Terminal {
         Ok(())
     }
 
-    pub fn get_size() -> Result<Shape, Error> {
+    pub fn get_shape() -> Result<Shape, Error> {
         let (width, height) = size()?;
         Ok(Shape { width, height })
     }
@@ -61,7 +62,7 @@ impl Terminal {
         Self::queue_command(Show)
     }
 
-    pub fn print(input: &str) -> Result<(), Error> {
+    pub fn print<T: Display>(input: T) -> Result<(), Error> {
         Self::queue_command(Print(input))
     }
 }
