@@ -1,6 +1,6 @@
 use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
 use std::io::Error;
-use terminal::Terminal;
+use terminal::{Shape, Terminal};
 
 mod terminal;
 
@@ -21,11 +21,11 @@ impl Editor {
     }
 
     fn draw_rows() -> Result<(), Error> {
-        let terminal_dims = Terminal::get_size()?;
-        for row in 0..terminal_dims.height {
+        let Shape { height, .. } = Terminal::get_size()?;
+        for row in 0..height {
             Terminal::clear_line()?;
             Terminal::print("~")?;
-            if row + 1 < terminal_dims.height {
+            if row + 1 < height {
                 Terminal::print("\r\n")?;
             }
         }

@@ -5,7 +5,9 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearT
 use std::io::{stdout, Error, Write};
 
 pub struct Terminal;
-pub struct Size {
+
+#[derive(Clone, Copy)]
+pub struct Shape {
     pub width: u16,
     pub height: u16,
 }
@@ -16,9 +18,9 @@ impl Terminal {
         Ok(())
     }
 
-    pub fn get_size() -> Result<Size, Error> {
+    pub fn get_size() -> Result<Shape, Error> {
         let (width, height) = size()?;
-        Ok(Size { width, height })
+        Ok(Shape { width, height })
     }
 
     pub fn clear_screen() -> Result<(), Error> {
