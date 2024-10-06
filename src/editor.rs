@@ -1,8 +1,11 @@
-use crossterm::event::{
-    read,
-    Event::{self, Key},
-    KeyCode::Char,
-    KeyEvent, KeyModifiers,
+use crossterm::{
+    event::{
+        read,
+        Event::{self, Key},
+        KeyCode::Char,
+        KeyEvent, KeyModifiers,
+    },
+    terminal::ClearType,
 };
 use std::io::Error;
 use terminal::{Shape, Terminal};
@@ -34,10 +37,11 @@ impl Editor {
 
     fn draw_welcome_message() -> Result<(), Error> {
         let mut welcome_message = format!("{NAME} editor -- version {VERSION}");
-        let width = Terminal::get_shape()?.width as usize;
+        let width = Terminal::shape()?.width;
         let length = welcome_message.len();
-        let padding = (width - length) / 2;
-        let spaces = " ".repeat(padding - 1);
+        #[allow(clippy::integer_division)] // Truncating is the intended functionality
+        let padding = (width.saturating_sub(length)) / 2;
+        let spaces = " ".repeat(padding.saturating_sub(1));
         welcome_message = format!("~{spaces}{welcome_message}");
         welcome_message.truncate(width);
         Terminal::print(welcome_message)?;
@@ -45,15 +49,16 @@ impl Editor {
     }
 
     fn draw_rows() -> Result<(), Error> {
-        let Shape { height, .. } = Terminal::get_shape()?;
+        let Shape { height, .. } = Terminal::shape()?;
         for row in 0..height {
-            Terminal::clear_line()?;
+            Terminal::clear_terminal(ClearType::CurrentLine)?;
+            #[allow(clippy::integer_division)]
             if row == height / 2 {
                 Self::draw_welcome_message()?;
             } else {
                 Self::draw_empty_row()?;
             }
-            if row + 1 < height {
+            if row.saturating_add(1) < height {
                 Terminal::print("\r\n")?;
             }
         }
@@ -63,7 +68,7 @@ impl Editor {
     fn refresh_screen(&self) -> Result<(), Error> {
         Terminal::hide_cursor()?;
         if self.will_quit {
-            Terminal::clear_screen()?;
+            Terminal::clear_terminal(ClearType::All)?;
             print!("Goodbye. \r\n");
         } else {
             Self::draw_rows()?;

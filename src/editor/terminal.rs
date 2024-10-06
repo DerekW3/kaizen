@@ -1,7 +1,10 @@
-use crossterm::cursor::{Hide, MoveTo, Show};
-use crossterm::style::Print;
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType};
-use crossterm::{queue, Command};
+use crossterm::{
+    cursor::{Hide, MoveTo, Show},
+    queue,
+    style::Print,
+    terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType},
+    Command,
+};
 use std::fmt::Display;
 use std::io::{stdout, Error, Write};
 
