@@ -21,10 +21,16 @@ impl Editor {
     }
 
     fn draw_rows() -> Result<(), Error> {
-        let Shape { height, .. } = Terminal::get_size()?;
+        let Shape { width, height } = Terminal::get_size()?;
         for row in 0..height {
             Terminal::clear_line()?;
             Terminal::print("~")?;
+            if row == height / 2 {
+                let welcome = "kaizen 0.1.0";
+                let spacing = " ".repeat((width / 2) as usize - (welcome.len() / 2) + 1);
+                Terminal::print(&spacing)?;
+                Terminal::print(welcome)?;
+            }
             if row + 1 < height {
                 Terminal::print("\r\n")?;
             }
