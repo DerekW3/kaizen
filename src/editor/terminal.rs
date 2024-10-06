@@ -1,7 +1,7 @@
 use crossterm::cursor::{Hide, MoveTo, Show};
-use crossterm::queue;
 use crossterm::style::Print;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType};
+use crossterm::{queue, Command};
 use std::io::{stdout, Error, Write};
 
 pub struct Terminal;
@@ -13,6 +13,10 @@ pub struct Shape {
 }
 
 impl Terminal {
+    pub fn queue_command<T: Command>(command: T) -> Result<(), Error> {
+        queue!(stdout(), command)
+    }
+
     pub fn execute() -> Result<(), Error> {
         stdout().flush()?;
         Ok(())
@@ -46,22 +50,18 @@ impl Terminal {
     }
 
     pub fn move_cursor(w: u16, h: u16) -> Result<(), Error> {
-        queue!(stdout(), MoveTo(w, h))?;
-        Ok(())
+        Self::queue_command(MoveTo(w, h))
     }
 
     pub fn hide_cursor() -> Result<(), Error> {
-        queue!(stdout(), Hide)?;
-        Ok(())
+        Self::queue_command(Hide)
     }
 
     pub fn show_cursor() -> Result<(), Error> {
-        queue!(stdout(), Show)?;
-        Ok(())
+        Self::queue_command(Show)
     }
 
     pub fn print(input: &str) -> Result<(), Error> {
-        queue!(stdout(), Print(input))?;
-        Ok(())
+        Self::queue_command(Print(input))
     }
 }
