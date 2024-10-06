@@ -9,8 +9,8 @@ pub struct Terminal;
 
 #[derive(Clone, Copy)]
 pub struct Shape {
-    pub width: u16,
-    pub height: u16,
+    pub width: usize,
+    pub height: usize,
 }
 
 impl Terminal {
@@ -23,24 +23,30 @@ impl Terminal {
         Ok(())
     }
 
-    pub fn get_shape() -> Result<Shape, Error> {
-        let (width, height) = size()?;
+    /// Returns the shape of the current terminal window
+    ///
+    /// @`EdgeCases`
+    ///     usize < u16: width/height truncated to usize
+    ///
+    /// @Returns
+    ///     `Shape` - named struct holding width and height
+    ///     `std::io::Error` - error reading terminal dimensions
+    pub fn shape() -> Result<Shape, Error> {
+        let (width_u16, height_u16) = size()?;
+        #[allow(clippy::as_conversions)] // clippy::as_conversions: See docstring above
+        let width = width_u16 as usize;
+        #[allow(clippy::as_conversions)] // clippy::as_conversions: See docstring above
+        let height = height_u16 as usize;
         Ok(Shape { width, height })
     }
 
-    pub fn clear_screen() -> Result<(), Error> {
-        queue!(stdout(), Clear(ClearType::All))?;
-        Ok(())
-    }
-
-    pub fn clear_line() -> Result<(), Error> {
-        queue!(stdout(), Clear(ClearType::CurrentLine))?;
-        Ok(())
+    pub fn clear_terminal(clear_type: ClearType) -> Result<(), Error> {
+        Self::queue_command(Clear(clear_type))
     }
 
     pub fn initialize() -> Result<(), Error> {
         enable_raw_mode()?;
-        Self::clear_screen()?;
+        Self::clear_terminal(ClearType::All)?;
         Self::move_cursor(0, 0)?;
         Self::execute()?;
         Ok(())
