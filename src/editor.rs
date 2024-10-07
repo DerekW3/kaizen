@@ -10,6 +10,7 @@ use crossterm::{
 use std::io::Error;
 use terminal::{Shape, Terminal};
 
+mod cursor;
 mod terminal;
 
 const NAME: &str = env!("CARGO_PKG_NAME");
